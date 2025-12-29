@@ -1,14 +1,20 @@
 #include <math.h>
 #include "config.h"
+#include "potential.h"
+#include "field.h"
 
 double coulomb_potential(int i, int j, int k) 
 {
-    double x = i * dx;
-    double y = j * dx;
-    double z = k * dx;
+    int idx = INDEX(i, j, k);
+    return -1.0/V_coulomb[idx];
+}
 
-    double r = sqrt(x * x + y * y + z * z + eps * eps);
+double external_potential(int i, int j, int k, int time) 
+{
+    // Placeholder for an external potential, e.g., harmonic oscillator
+    int idx = INDEX(i, j, k);
 
-    return 1.0 / r;
+    double k_spring = 0.1; // Spring constant
+    return 0.5 * k_spring * r[idx] * r[idx];
 }
 

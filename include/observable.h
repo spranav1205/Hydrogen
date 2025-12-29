@@ -7,6 +7,7 @@
 #include "grid.h"
 
 typedef struct {
+    double probability_density;
     double position[3];
     double energy;
 } Observable;
