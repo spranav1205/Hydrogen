@@ -1,6 +1,7 @@
 #include "config.h"
 #include "hamiltonian.h"
 #include "observable.h"
+#include "field.h"
 #include <stddef.h>
 #include <mpi.h>
 #include <math.h>
@@ -50,8 +51,6 @@ Observable expectation(complex double* wavefunction, int Nz_local)
     obs.position[2] = 0.0;
     obs.energy = 0.0;
 
-    double total_probability = 0.0;
-
     for (int k = 1; k < Nz_local - 1; k++) 
     {
         for (int j = 1; j < Ny - 1; j++) 
@@ -59,7 +58,6 @@ Observable expectation(complex double* wavefunction, int Nz_local)
             for (int i = 1; i < Nx - 1; i++) 
             {
                 Observable local_obs = measure(wavefunction, i, j, k);
-                total_probability += local_obs.probability_density;
                 obs.probability_density += local_obs.probability_density;
                 obs.position[0] += local_obs.position[0] * local_obs.probability_density;
                 obs.position[1] += local_obs.position[1] * local_obs.probability_density;

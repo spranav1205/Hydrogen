@@ -3,7 +3,6 @@
 
 #include <complex.h>
 #include <stdlib.h>
-
 #include "config.h"
 
 extern double _Complex *psi;

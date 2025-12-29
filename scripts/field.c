@@ -14,9 +14,6 @@ void allocate_fields(int Nz_local)
     psi_new = malloc(N * sizeof(double complex));
     r = malloc(N * sizeof(double));
     V_coulomb = malloc(N * sizeof(double));
-
-    if (!psi || !psi_new || !r || !V_coulomb)
-        abort();
 }
 
 void free_fields()
