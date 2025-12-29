@@ -1,8 +1,29 @@
 #include "config.h"
 #include "hamiltonian.h"
 #include "observable.h"
+#include <stddef.h>
+#include <mpi.h>
 #include <math.h>
 #include <complex.h>
+
+MPI_Datatype create_observable_type() {
+    MPI_Datatype MPI_OBSERVABLE;
+    
+    int blocklengths[3] = {1, 3, 1};
+    MPI_Aint displacements[3];
+    MPI_Datatype types[3] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE};
+    
+    // Calculate displacements
+    displacements[0] = offsetof(Observable, probability_density);
+    displacements[1] = offsetof(Observable, position);
+    displacements[2] = offsetof(Observable, energy);
+    
+    MPI_Type_create_struct(3, blocklengths, displacements, types, &MPI_OBSERVABLE);
+    MPI_Type_commit(&MPI_OBSERVABLE);
+    
+    return MPI_OBSERVABLE;
+}
+
 
 Observable measure(complex double* wavefunction, int i, int j, int k)
 {
@@ -47,6 +68,18 @@ Observable expectation(complex double* wavefunction, int Nz_local)
             }
         }
     }
-    
+
     return obs;
 }
+
+Observable gather_observables(int Nz_local, MPI_Datatype MPI_OBSERVABLE)
+{
+    Observable local_obs, global_obs;
+    
+    local_obs = expectation(psi, Nz_local);
+    MPI_Allreduce(&local_obs, &global_obs, 1, MPI_OBSERVABLE, MPI_SUM, MPI_COMM_WORLD);
+
+    return global_obs;
+}
+
+//TODO: Add normalization after gathering observables
