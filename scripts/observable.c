@@ -7,6 +7,21 @@
 #include <math.h>
 #include <complex.h>
 
+// Custom reduction function for Observable struct
+void observable_reduce(void *invec, void *inoutvec, int *len, MPI_Datatype *datatype)
+{
+    Observable *in = (Observable *)invec;
+    Observable *inout = (Observable *)inoutvec;
+    
+    for (int i = 0; i < *len; i++) {
+        inout[i].probability_density += in[i].probability_density;
+        inout[i].position[0] += in[i].position[0];
+        inout[i].position[1] += in[i].position[1];
+        inout[i].position[2] += in[i].position[2];
+        inout[i].energy += in[i].energy;
+    }
+}
+
 MPI_Datatype create_observable_type() {
     MPI_Datatype MPI_OBSERVABLE;
     
@@ -51,7 +66,7 @@ Observable expectation(complex double* wavefunction, int Nz_local, int time)
     obs.position[2] = 0.0;
     obs.energy = 0.0;
 
-    for (int k = 1; k < Nz_local + 2; k++) 
+    for (int k = 1; k <= Nz_local; k++) 
     {
         for (int j = 1; j < Ny - 1; j++) 
         {
@@ -70,17 +85,26 @@ Observable expectation(complex double* wavefunction, int Nz_local, int time)
     return obs;
 }
 
-Observable gather_observables(int Nz_local, MPI_Datatype MPI_OBSERVABLE)
+Observable gather_observables(int Nz_local, int time, MPI_Datatype MPI_OBSERVABLE)
 {
     Observable local_obs, global_obs;
     
-    local_obs = expectation(psi, Nz_local);
-    MPI_Allreduce(&local_obs, &global_obs, 1, MPI_OBSERVABLE, MPI_SUM, MPI_COMM_WORLD);
+    local_obs = expectation(psi, Nz_local, time);
+    
+    // Create custom MPI operation for Observable reduction
+    MPI_Op MPI_OBS_SUM;
+    MPI_Op_create(observable_reduce, 1, &MPI_OBS_SUM);
+    
+    MPI_Allreduce(&local_obs, &global_obs, 1, MPI_OBSERVABLE, MPI_OBS_SUM, MPI_COMM_WORLD);
+    
+    MPI_Op_free(&MPI_OBS_SUM);
 
-    global_obs.position[0] /= global_obs.probability_density;
-    global_obs.position[1] /= global_obs.probability_density;
-    global_obs.position[2] /= global_obs.probability_density;
-    global_obs.energy /= global_obs.probability_density;
+    if (global_obs.probability_density > 0) {
+        global_obs.position[0] /= global_obs.probability_density;
+        global_obs.position[1] /= global_obs.probability_density;
+        global_obs.position[2] /= global_obs.probability_density;
+        global_obs.energy /= global_obs.probability_density;
+    }
 
     return global_obs;
 }

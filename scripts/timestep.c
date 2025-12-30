@@ -1,11 +1,12 @@
 #include "../include/config.h"
 #include "../include/hamiltonian.h"
 #include "../include/timestep.h"
+#include "../include/grid.h"
 #include <complex.h>
 
 void apply_stencil(complex double* wavefunction, complex double* new_wavefunction, int Nz_local, int time) 
 {
-    for (int k = 1; k < Nz_local+2; k++) // Skip ghost cells (IMPORTANT)
+    for (int k = 1; k <= Nz_local; k++) // Skip ghost cells (IMPORTANT)
     {
         for (int j = 1; j < Ny - 1; j++) 
         {

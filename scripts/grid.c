@@ -1,5 +1,6 @@
 #include "../include/config.h"
 #include "../include/grid.h"
+#include <math.h>
 #include <complex.h>
 
 void initialize_grid(complex double* grid, int Nz_local) 
@@ -10,7 +11,14 @@ void initialize_grid(complex double* grid, int Nz_local)
         for (int j = 0; j < Ny; j++) {
             for (int i = 0; i < Nx; i++) {
                 int idx = INDEX(i, j, k);
-                grid[idx] = 0.0 + 0.0 * I;
+                double x = i * dx;
+                double y = j * dx;
+                double z = k * dx;
+                double r = sqrt(x * x + y * y + z * z + eps * eps);
+                
+                // 1s orbital: ψ_{1s}(r) = (1/√π) * exp(-r)
+                double psi_1s = (1.0 / sqrt(M_PI)) * exp(-r);
+                grid[idx] = psi_1s + 0.0 * I;
             }
         }
     }

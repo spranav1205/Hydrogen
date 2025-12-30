@@ -7,7 +7,7 @@
 double coulomb_potential(int i, int j, int k) 
 {
     int idx = INDEX(i, j, k);
-    return -1.0/V_coulomb[idx];
+    return V_coulomb[idx];
 }
 
 double external_potential(int i, int j, int k, int time) 

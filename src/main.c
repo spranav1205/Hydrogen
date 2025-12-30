@@ -35,7 +35,7 @@ int main()
         psi_new = temp;
 
         if (time % output_interval == 0) {
-            Observable obs = expectation(psi, Nz_local, time);
+            Observable obs = gather_observables(Nz_local, time, create_observable_type());
             if (my_rank == 0) {
                 printf("Time step %d: <E> = %f\n", time, obs.energy);
                 printf("               <x> = %f, <y> = %f, <z> = %f\n", obs.position[0], obs.position[1], obs.position[2]);

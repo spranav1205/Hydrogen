@@ -1,4 +1,5 @@
 #include "../include/config.h"
+#include <stdlib.h>
 #include <complex.h>
 
 double complex *psi;
