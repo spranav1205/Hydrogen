@@ -1,5 +1,5 @@
-#include "config.h"
-#include "grid.h"
+#include "../include/config.h"
+#include "../include/grid.h"
 #include <complex.h>
 
 void initialize_grid(complex double* grid, int Nz_local) 

@@ -1,6 +1,6 @@
-#include "config.h"
-#include "hamiltonian.h"
-#include "timestep.h"
+#include "../include/config.h"
+#include "../include/hamiltonian.h"
+#include "../include/timestep.h"
 #include <complex.h>
 
 void apply_stencil(complex double* wavefunction, complex double* new_wavefunction, int Nz_local) 

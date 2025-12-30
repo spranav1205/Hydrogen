@@ -1,7 +1,7 @@
-#include "config.h"
-#include "hamiltonian.h"
-#include "observable.h"
-#include "field.h"
+#include "../include/config.h"
+#include "../include/hamiltonian.h"
+#include "../include/observable.h"
+#include "../include/field.h"
 #include <stddef.h>
 #include <mpi.h>
 #include <math.h>

@@ -1,7 +1,7 @@
 #include <math.h>
-#include "config.h"
-#include "potential.h"
-#include "field.h"
+#include "../include/config.h"
+#include "../include/potential.h"
+#include "../include/field.h"
 
 double coulomb_potential(int i, int j, int k) 
 {

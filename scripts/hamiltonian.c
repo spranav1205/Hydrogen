@@ -1,5 +1,5 @@
-#include "config.h"
-#include "potential.h"
+#include "../include/config.h"
+#include "../include/potential.h"
 
 double hamiltonian_operator(int i, int j, int k, int time) 
 {
