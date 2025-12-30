@@ -26,8 +26,8 @@ void write_header(FILE* file) {
 }
 
 void log_observable(FILE* file, int timestep, Observable obs) {
-    fprintf(file, "[t=%d] Energy: %.6f | Position: (%.4f, %.4f, %.4f) | Probability: %.6f\n",
-            timestep, obs.energy, obs.position[0], obs.position[1], obs.position[2], obs.probability_density);
+    fprintf(file, "[t=%d] Energy: %.6f | Position: (%.4f, %.4f, %.4f) | <r^2>: %.6f | Probability: %.6f\n",
+            timestep, obs.energy, obs.position[0], obs.position[1], obs.position[2], obs.r_squared, obs.probability_density);
 }
 
 void write_note(FILE* file, const char* note) {

@@ -7,8 +7,11 @@
 
 #define INDEX(i, j, k) ((i) + Nx * ((j) + Ny * (k)))
 
-void initialize_grid(complex double* grid, int Nz_local);
+extern int my_rank;
+extern int comm_size;
+
 void initialize_r(double* r, int Nz_local);
+void initialize_grid(complex double* grid, double* r, int Nz_local);
 void initialize_potential(double* V_coulomb, double* r, int Nz_local);
 
 #endif /* HYDROGEN_GRID_H */

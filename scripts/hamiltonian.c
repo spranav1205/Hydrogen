@@ -4,16 +4,22 @@
 #include "../include/field.h"
 #include "../include/grid.h"
 
-double hamiltonian_operator(int i, int j, int k, int time) 
+complex double hamiltonian_operator(int i, int j, int k, int time) 
 {
+    // Verify
+    
     int idx = INDEX(i, j, k);
     double V = coulomb_potential(i, j, k) + external_potential(i, j, k, time);
-    double K = -0.5 * kinetic * (
+    
+    // Compute kinetic energy operator acting on psi (Laplacian)
+    complex double laplacian = (
         (psi[INDEX(i+1, j, k)] - 2 * psi[idx] + psi[INDEX(i-1, j, k)]) / (dx * dx) +
         (psi[INDEX(i, j+1, k)] - 2 * psi[idx] + psi[INDEX(i, j-1, k)]) / (dx * dx) +
         (psi[INDEX(i, j, k+1)] - 2 * psi[idx] + psi[INDEX(i, j, k-1)]) / (dx * dx)
     );
-
-    return K + V;
-}
     
+    complex double K_psi = -0.5 * kinetic * laplacian;
+    
+    // Return H*psi = (K + V)*psi
+    return K_psi + V * psi[idx];
+}

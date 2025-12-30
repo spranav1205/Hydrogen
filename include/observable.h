@@ -11,6 +11,7 @@ typedef struct {
     double probability_density;
     double position[3];
     double energy;
+    double r_squared;
 } Observable;
 
 MPI_Datatype create_observable_type(void);

@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "potential.h"
+#include <complex.h>
 
-double hamiltonian_operator(int i, int j, int k, int time);
-
+complex double hamiltonian_operator(int i, int j, int k, int time);
 #endif /* HYDROGEN_HAMILTONIAN_H */
