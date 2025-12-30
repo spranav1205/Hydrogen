@@ -1,5 +1,6 @@
 #include "../include/config.h"
 #include "../include/potential.h"
+#include "../include/grid.h"
 
 double hamiltonian_operator(int i, int j, int k, int time) 
 {

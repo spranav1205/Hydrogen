@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include "config.h"
 
-extern double _Complex *psi;
-extern double _Complex *psi_new;
+extern complex double *psi;
+extern complex double *psi_new;
 extern double *r;
 extern double *V_coulomb;
 

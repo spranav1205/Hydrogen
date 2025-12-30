@@ -26,10 +26,10 @@ MPI_Datatype create_observable_type() {
 }
 
 
-Observable measure(complex double* wavefunction, int i, int j, int k)
+Observable measure(complex double* wavefunction, int i, int j, int k, int time)
 {
     int idx = INDEX(i, j, k);
-    double E = hamiltonian_operator(i, j, k);
+    double E = hamiltonian_operator(i, j, k, time);
     double probability_density = creal(wavefunction[idx] * conj(wavefunction[idx]));
 
     Observable obs;

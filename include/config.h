@@ -9,6 +9,8 @@
 
 #define kinetic 1.0 /* Factor for kinetic energy: hbar^2 / (2m) */
 
+#define output_interval 100
+
 #define dx 0.01
 #define dt 0.001
 

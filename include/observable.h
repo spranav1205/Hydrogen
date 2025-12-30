@@ -2,6 +2,7 @@
 #define HYDROGEN_OBSERVABLE_H
 
 #include <complex.h>
+#include <mpi.h>
 
 #include "config.h"
 #include "grid.h"
@@ -12,6 +13,9 @@ typedef struct {
     double energy;
 } Observable;
 
-Observable measure(complex double* wavefunction, int i, int j, int k);
+MPI_Datatype create_observable_type(void);
+Observable measure(complex double* wavefunction, int i, int j, int k, int time);
+Observable expectation(complex double* wavefunction, int Nz_local);
+Observable gather_observables(int Nz_local, MPI_Datatype MPI_OBSERVABLE);
 
 #endif /* HYDROGEN_OBSERVABLE_H */

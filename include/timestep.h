@@ -1,6 +1,8 @@
 #ifndef HYDROGEN_TIMESTEP_H
 #define HYDROGEN_TIMESTEP_H
 
-/* Time-evolution interfaces go here. */
+#include <complex.h>
+
+void apply_stencil(complex double* wavefunction, complex double* new_wavefunction, int Nz_local);
 
 #endif /* HYDROGEN_TIMESTEP_H */

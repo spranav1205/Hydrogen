@@ -4,6 +4,6 @@
 #include "config.h"
 #include "potential.h"
 
-double hamiltonian_operator(int i, int j, int k);
+double hamiltonian_operator(int i, int j, int k, int time);
 
 #endif /* HYDROGEN_HAMILTONIAN_H */
