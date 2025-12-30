@@ -5,7 +5,7 @@
 
 void apply_stencil(complex double* wavefunction, complex double* new_wavefunction, int Nz_local) 
 {
-    for (int k = 1; k < Nz_local - 1; k++) 
+    for (int k = 1; k < Nz_local - 1; k++) // Skip ghost cells (IMPORTANT)
     {
         for (int j = 1; j < Ny - 1; j++) 
         {
