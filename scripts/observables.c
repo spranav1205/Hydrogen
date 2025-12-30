@@ -42,7 +42,7 @@ Observable measure(complex double* wavefunction, int i, int j, int k, int time)
     return obs;
 }
 
-Observable expectation(complex double* wavefunction, int Nz_local)
+Observable expectation(complex double* wavefunction, int Nz_local, int time)
 {
     Observable obs;
     obs.probability_density = 0.0;
@@ -51,13 +51,13 @@ Observable expectation(complex double* wavefunction, int Nz_local)
     obs.position[2] = 0.0;
     obs.energy = 0.0;
 
-    for (int k = 1; k < Nz_local - 1; k++) 
+    for (int k = 1; k < Nz_local + 2; k++) 
     {
         for (int j = 1; j < Ny - 1; j++) 
         {
             for (int i = 1; i < Nx - 1; i++) 
             {
-                Observable local_obs = measure(wavefunction, i, j, k);
+                Observable local_obs = measure(wavefunction, i, j, k, time);
                 obs.probability_density += local_obs.probability_density;
                 obs.position[0] += local_obs.position[0] * local_obs.probability_density;
                 obs.position[1] += local_obs.position[1] * local_obs.probability_density;
@@ -76,6 +76,11 @@ Observable gather_observables(int Nz_local, MPI_Datatype MPI_OBSERVABLE)
     
     local_obs = expectation(psi, Nz_local);
     MPI_Allreduce(&local_obs, &global_obs, 1, MPI_OBSERVABLE, MPI_SUM, MPI_COMM_WORLD);
+
+    global_obs.position[0] /= global_obs.probability_density;
+    global_obs.position[1] /= global_obs.probability_density;
+    global_obs.position[2] /= global_obs.probability_density;
+    global_obs.energy /= global_obs.probability_density;
 
     return global_obs;
 }

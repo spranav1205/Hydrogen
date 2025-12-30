@@ -3,16 +3,16 @@
 #include "../include/timestep.h"
 #include <complex.h>
 
-void apply_stencil(complex double* wavefunction, complex double* new_wavefunction, int Nz_local) 
+void apply_stencil(complex double* wavefunction, complex double* new_wavefunction, int Nz_local, int time) 
 {
-    for (int k = 1; k < Nz_local - 1; k++) // Skip ghost cells (IMPORTANT)
+    for (int k = 1; k < Nz_local+2; k++) // Skip ghost cells (IMPORTANT)
     {
         for (int j = 1; j < Ny - 1; j++) 
         {
             for (int i = 1; i < Nx - 1; i++) 
             {
                 int idx = INDEX(i, j, k);
-                double H_psi = hamiltonian_operator(i, j, k);
+                double H_psi = hamiltonian_operator(i, j, k, time);
                 new_wavefunction[idx] = wavefunction[idx] - I * dt * H_psi * wavefunction[idx];
             }
         }

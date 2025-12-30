@@ -25,8 +25,8 @@ int main()
     initialize_r(r, Nz_local);
     initialize_potential(V_coulomb, r, Nz_local);
 
-    for (int t=0; t<Nt; t++) {
-        apply_stencil(psi, psi_new, Nz_local);
+    for (int time=0; time<Nt; time++) {
+        apply_stencil(psi, psi_new, Nz_local, time);
         exchange_ghost_cells(psi_new, Nz_local);
 
         // Swap pointers
@@ -34,10 +34,10 @@ int main()
         psi = psi_new;
         psi_new = temp;
 
-        if (t % output_interval == 0) {
-            Observable obs = expectation(psi, Nz_local);
+        if (time % output_interval == 0) {
+            Observable obs = expectation(psi, Nz_local, time);
             if (my_rank == 0) {
-                printf("Time step %d: <E> = %f\n", t, obs.energy);
+                printf("Time step %d: <E> = %f\n", time, obs.energy);
                 printf("               <x> = %f, <y> = %f, <z> = %f\n", obs.position[0], obs.position[1], obs.position[2]);
             }
         }
