@@ -45,21 +45,21 @@ MPI_Datatype create_observable_type() {
     return MPI_OBSERVABLE;
 }
 
-
 Observable measure(complex double* wavefunction, int i, int j, int k, int time)
 {
     int idx = INDEX(i, j, k);
-    complex double H_psi = hamiltonian_operator(i, j, k, time);
-    // Energy expectation: <ψ|H|ψ> / <ψ|ψ>
-    double E = creal(conj(wavefunction[idx]) * H_psi);
-    double probability_density = creal(wavefunction[idx] * conj(wavefunction[idx]));
+    double probability_density = creal(wavefunction[idx] * conj(wavefunction[idx])) * dV;
 
-    // Centered coordinates (global) so <r> should be ~0 for symmetric states
-    double x_center = (Nx - 1) * dx / 2.0;
-    double y_center = (Ny - 1) * dx / 2.0;
-    int Nz_global = Nz / comm_size; 
-    int z_global = my_rank * Nz_global + (k - 1); // k runs 1..Nz_local (physical cells)
-    double z_center = (Nz - 1) * dx / 2.0;
+    // Local energy density: Re(psi* H psi) normalized by |psi|^2 
+    // IMPORTANT
+    complex double H_psi = hamiltonian_operator(i, j, k, time);
+    double norm2 = creal(wavefunction[idx] * conj(wavefunction[idx]));
+    double E = 0.0;
+    if (norm2 > 0.0) {
+        E = creal(conj(wavefunction[idx]) * H_psi) / norm2;
+    }
+
+    int z_global = my_rank * Nz/comm_size + (k - 1); // k runs 1..Nz_local (physical cells) IMPORTANT
 
     Observable obs;
     obs.probability_density = probability_density;
@@ -74,7 +74,6 @@ Observable measure(complex double* wavefunction, int i, int j, int k, int time)
 
 Observable expectation(complex double* wavefunction, int Nz_local, int time)
 {
-    const double dV = dx * dx * dx;
     Observable obs;
     obs.probability_density = 0.0;
     obs.position[0] = 0.0;
@@ -90,7 +89,7 @@ Observable expectation(complex double* wavefunction, int Nz_local, int time)
             for (int i = 1; i < Nx - 1; i++) 
             {
                 Observable local_obs = measure(wavefunction, i, j, k, time);
-                double weight = local_obs.probability_density * dV;
+                double weight = local_obs.probability_density;
                 obs.probability_density += weight;
                 obs.position[0] += local_obs.position[0] * weight;
                 obs.position[1] += local_obs.position[1] * weight;
@@ -104,19 +103,13 @@ Observable expectation(complex double* wavefunction, int Nz_local, int time)
     return obs;
 }
 
-Observable gather_observables(int Nz_local, int time, MPI_Datatype MPI_OBSERVABLE)
+Observable gather_observables(int Nz_local, int time, MPI_Datatype MPI_OBSERVABLE, MPI_Op MPI_OBS_SUM)
 {
     Observable local_obs, global_obs;
     
     local_obs = expectation(psi, Nz_local, time);
     
-    // Create custom MPI operation for Observable reduction
-    MPI_Op MPI_OBS_SUM;
-    MPI_Op_create(observable_reduce, 1, &MPI_OBS_SUM);
-    
     MPI_Allreduce(&local_obs, &global_obs, 1, MPI_OBSERVABLE, MPI_OBS_SUM, MPI_COMM_WORLD);
-    
-    MPI_Op_free(&MPI_OBS_SUM);
 
     if (global_obs.probability_density > 0) {
         global_obs.position[0] /= global_obs.probability_density;

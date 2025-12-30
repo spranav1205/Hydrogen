@@ -19,6 +19,10 @@ int main()
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
 
+    MPI_Op MPI_OBS_SUM;
+    MPI_Op_create(observable_reduce, 1, &MPI_OBS_SUM);
+    MPI_Datatype MPI_OBSERVABLE = create_observable_type();
+
     int Nz_local = Nz / comm_size; // Simple division of grid in z-direction
 
     allocate_fields(Nz_local);
@@ -26,6 +30,17 @@ int main()
     initialize_grid(psi, r, Nz_local);
     initialize_potential(V_coulomb, r, Nz_local);
     normalize_wavefunction(psi, Nz_local); 
+
+    // Report initial state before any time stepping
+    Observable obs0 = gather_observables(Nz_local, 0, MPI_OBSERVABLE, MPI_OBS_SUM);
+    if (my_rank == 0) {
+        double energy_eV0 = obs0.energy * 27.2;
+        printf("Time step %d: <E> = %.6f a.u. = %.3f eV\n", 0, obs0.energy, energy_eV0);
+        printf("               <x> = %.4f, <y> = %.4f, <z> = %.4f Bohr\n", 
+               obs0.position[0], obs0.position[1], obs0.position[2]);
+        printf("               <r> = %.6f Bohr\n", sqrt(obs0.r_squared));
+        printf("               Expected (hydrogen 1s): E₀ = -0.5 a.u. = -13.6 eV, <r> = 1.5 Bohr\n");
+    }
 
     for (int time=0; time<Nt; time++) {
         apply_stencil(psi, psi_new, Nz_local, time);
@@ -38,24 +53,24 @@ int main()
 
         normalize_wavefunction(psi, Nz_local);
 
-        if (time % output_interval == 0) {
-            Observable obs = gather_observables(Nz_local, time, create_observable_type());
+        int step = time + 1; // after one update
+        if (step % output_interval == 0) {
+            Observable obs = gather_observables(Nz_local, step, MPI_OBSERVABLE, MPI_OBS_SUM);
             if (my_rank == 0) {
                 // Convert atomic units to eV for display
                 // 1 Hartree = 27.2 eV
                 double energy_eV = obs.energy * 27.2;
-                printf("Time step %d: <E> = %.6f a.u. = %.3f eV\n", time, obs.energy, energy_eV);
+                printf("Time step %d: <E> = %.6f a.u. = %.3f eV\n", step, obs.energy, energy_eV);
                 printf("               <x> = %.4f, <y> = %.4f, <z> = %.4f Bohr\n", 
                        obs.position[0], obs.position[1], obs.position[2]);
-                printf("               <r> = %.6f Bohr^2\n", sqrt(obs.r_squared));
-                if (time == 0) {
-                    printf("               Expected (hydrogen 1s): E₀ = -0.5 a.u. = -13.6 eV, <r> = 1.5 Bohr\n");
-                }
+                printf("               <r> = %.6f Bohr\n", sqrt(obs.r_squared));
             }
         }
     }
     
     free_fields();
+    MPI_Type_free(&MPI_OBSERVABLE);
+    MPI_Op_free(&MPI_OBS_SUM);
     MPI_Finalize();
     return 0;
 }

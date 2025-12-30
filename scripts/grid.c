@@ -11,7 +11,7 @@ void initialize_grid(complex double* grid, double* r, int Nz_local)
             for (int i = 0; i < Nx; i++) {
                 int idx = INDEX(i, j, k);
                 
-                // 1s orbital: ψ_{1s}(r) = (1/√π) * exp(-r)
+                // 1s orbital: ψ_{1s}(r) = (1/√π) * exp(-r) (in atomic units)
                 double psi_1s = (1.0 / sqrt(M_PI)) * exp(-r[idx]);
                 grid[idx] = psi_1s + 0.0 * I;
             }
@@ -21,12 +21,7 @@ void initialize_grid(complex double* grid, double* r, int Nz_local)
 
 void initialize_r(double* r, int Nz_local) 
 {
-    int z_offset = my_rank * Nz_local - 1; // account for leading ghost cell
-    
-    // Center of global domain
-    double x_center = (Nx - 1) * dx / 2.0;
-    double y_center = (Ny - 1) * dx / 2.0;
-    double z_center = (Nz - 1) * dx / 2.0;
+    int z_offset = my_rank * Nz_local; // account for leading ghost cell
 
     for (int k = 0; k < Nz_local+2; k++) {
         for (int j = 0; j < Ny; j++) {
@@ -35,7 +30,7 @@ void initialize_r(double* r, int Nz_local)
                 double x = i * dx - x_center;
                 double y = j * dx - y_center;
                 // IMPORTANT: global z coordinate
-                double z = (z_offset + k) * dx - z_center;
+                double z = (z_offset + k - 1) * dx - z_center;
                 r[idx] = sqrt(x * x + y * y + z * z + eps * eps);
             }
         }

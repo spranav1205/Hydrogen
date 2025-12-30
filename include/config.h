@@ -9,20 +9,25 @@
 // ============================================================================
 
 // Grid parameters (refined)
-#define Nx 200
-#define Ny 200
-#define Nz 200
+#define Nx 500
+#define Ny 500
+#define Nz 500
 
-#define Nt 10000
+#define x_center (Nx - 1) * dx / 2.0
+#define y_center (Ny - 1) * dx / 2.0
+#define z_center (Nz - 1) * dx / 2.0
+
+#define Nt 100
 
 // Physical parameters in ATOMIC UNITS
-#define dx 0.1                    // 0.1 Bohr radii (~0.0529 Å) finer grid
+#define dx 0.02                    // 0.1 Bohr radii (~0.0529 Å) finer grid
 #define dt 0.00005                // smaller dt for stability on finer grid (explicit Euler)
+#define dV (dx * dx * dx)        // Volume element
 
 // In atomic units: kinetic = ℏ²/(2m) = 1/2
 #define kinetic 0.5
 
-#define output_interval 100
+#define output_interval 10
 
 extern double eps;
 

@@ -24,7 +24,6 @@ void apply_stencil(complex double* wavefunction, complex double* new_wavefunctio
 
 void normalize_wavefunction(complex double* wavefunction, int Nz_local)
 {
-    const double dV = dx * dx * dx;
     double local_norm = 0.0;
     for (int k = 1; k <= Nz_local; k++) {
         for (int j = 1; j < Ny - 1; j++) {

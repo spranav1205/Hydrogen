@@ -3,6 +3,7 @@
 #include "../include/hamiltonian.h"
 #include "../include/field.h"
 #include "../include/grid.h"
+#include <complex.h>
 
 complex double hamiltonian_operator(int i, int j, int k, int time) 
 {
@@ -18,7 +19,7 @@ complex double hamiltonian_operator(int i, int j, int k, int time)
         (psi[INDEX(i, j, k+1)] - 2 * psi[idx] + psi[INDEX(i, j, k-1)]) / (dx * dx)
     );
     
-    complex double K_psi = -0.5 * kinetic * laplacian;
+    complex double K_psi = -kinetic * laplacian;
     
     // Return H*psi = (K + V)*psi
     return K_psi + V * psi[idx];

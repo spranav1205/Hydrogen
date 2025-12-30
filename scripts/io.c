@@ -39,3 +39,5 @@ void close_output_file(FILE* file) {
         fclose(file);
     }
 }
+
+//TODO: Thread safe checkpointing function to save wavefunction and observables
